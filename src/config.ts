@@ -10,7 +10,7 @@ import { LinkPreset } from "./types/config";
 
 export const siteConfig: SiteConfig = {
 	title: "Fuwari",
-	subtitle: "Demo Site",
+	subtitle: "糖的小破站",
 	lang: "zh_CN", // Language code, e.g. 'en', 'zh-CN', 'ja', etc.
 	themeColor: {
 		hue: 250, // Default hue for the theme color, from 0 to 360. e.g. red: 0, teal: 200, cyan: 250, pink: 345
@@ -49,11 +49,6 @@ export const navBarConfig: NavBarConfig = {
 			name: "GitHub",
 			url: "https://github.com/saicaca/fuwari", // Internal links should not include the base path, as it is automatically added
 			external: true, // Show an external link icon and will open in a new tab
-		},
-		{
-			name: "统计",
-			url: "https://umami.cunique.top/share/ZOxKDi7465e8d3XO/www.cunique.top",
-			external: true,
 		},
 	],
 };
