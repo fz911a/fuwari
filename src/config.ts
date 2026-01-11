@@ -4,7 +4,7 @@ import type {
 	NavBarConfig,
 	ProfileConfig,
 	SiteConfig,
-	//UmamiConfig,
+	UmamiConfig,
 } from "./types/config";
 import { LinkPreset } from "./types/config";
 
@@ -88,4 +88,15 @@ export const expressiveCodeConfig: ExpressiveCodeConfig = {
 	// Note: Some styles (such as background color) are being overridden, see the astro.config.mjs file.
 	// Please select a dark theme, as this blog theme currently only supports dark background color
 	theme: "github-dark",
+};
+
+export const umamiConfig: UmamiConfig = {
+	enable: true,
+	// For Umami Cloud use: https://cloud.umami.is
+	// For self-hosted use your domain, e.g. https://umami.example.com
+	baseUrl: "https://umami.lvcdy.cn",
+	// Your Umami website ID (UUID). Set this to enable tracking.
+	shareId: "1d2fc39b-523b-4fdc-9508-b0c677ce4285",
+	// Optional: timezone for share pages or reporting
+	timezone: "Asia/Shanghai",
 };
