@@ -8,7 +8,6 @@ category: ''
 draft: false 
 lang: ''
 ---
-# cert-_update
 
 自动化SSL证书更新和部署系统，用于管理 `example.com` 域名的通配符证书。
 
