@@ -284,26 +284,8 @@ jobs:
 - **cert.key** - 私钥文件，用于服务器配置
 - **cert.pem** - 完整证书链，包含根证书和中间证书
 
-## 常见问题
-
-### Q: 证书申请失败如何排查？
-A: 检查以下几点：
-1. 确保所有 GitHub Secrets 已正确配置
-2. 验证阿里云 DNS 账户状态和 API 权限
-3. 查看工作流运行日志获取详细错误信息
-
-### Q: 证书多久更新一次？
-A: 目前需要手动触发。可以通过配置定时任务 (cron schedule) 实现自动更新。
-
-### Q: 如何修改要申请的域名？
-A: 修改 `ssl_issue_lvcdy.yml` 中的以下行：
-```yaml
---issue --dns dns_ali -d "*.lvcdy.cn"
-```
-
 ## 相关资源
 
 - [acme.sh 文档](https://github.com/acmesh-official/acme.sh)
-- [LiteSSL ACME](https://acme.litessl.com/)
 - [阿里云 DNS API](https://help.aliyun.com/zh/dns/)
 - [GitHub Actions 文档](https://docs.github.com/en/actions)
