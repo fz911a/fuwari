@@ -1,5 +1,5 @@
 ---
-title: panel
+title: Panel 介绍和搭建指北
 published: 2026-01-14
 description: ''
 image: ''
@@ -237,15 +237,3 @@ const currentYear = new Date().getFullYear();
 - Cloudflare Pages
 - 腾讯云 EO Pages
 - 自有服务器
-
-## 📝 许可证
-
-MIT License
-
-## 🤝 贡献
-
-欢迎提交 Issue 和 Pull Request！
-
----
-
-**Made with ❤️ by lvcdy**
