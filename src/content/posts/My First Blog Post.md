@@ -7,6 +7,7 @@ tags: []
 category: ''
 draft: false 
 lang: ''
+sticky: 1
 ---
 这是本站的第一篇文章，就说说未来的规划吧
 
