@@ -103,6 +103,205 @@ cert-_update/
 ├── LICENSE                          # 许可证文件
 └── README.md                        # 项目文档
 ```
+---
+
+### 1️⃣ 监测任务：`.github/workflows/ssl_check.yml`
+
+```yaml
+name: "SSL: 0.Check"
+
+on:
+  schedule:
+    - cron: '0 0 * * 1' # 每周一检测
+  workflow_dispatch:
+
+permissions:
+  actions: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - id: check
+        run: |
+          T="${{ vars.DOMAIN_CHECK }}" # 在 Variables 中配置
+          E=$(echo | openssl s_client -4 -connect $T:443 -servername $T -timeout 5 2>/dev/null | openssl x509 -noout -enddate | cut -d= -f2)
+          D=$(( ($(date -d "$E" +%s) - $(date +%s)) / 86400 ))
+          echo "Days: $D"
+          [ $D -lt 20 ] && echo "renew=true" >> $GITHUB_OUTPUT || echo "renew=false" >> $GITHUB_OUTPUT
+
+      - if: steps.check.outputs.renew == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'ssl_issue.yml',
+              ref: 'main'
+            })
+
+```
+
+---
+
+### 2️⃣ 申请任务：`.github/workflows/ssl_issue.yml`
+
+```yaml
+name: "SSL: 1.Issue"
+
+on:
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  issue:
+    runs-on: ubuntu-latest
+    env:
+      ACME: "https://acme.litessl.com/acme/v2/directory"
+      DOMAIN: "${{ vars.DOMAIN_MAIN }}"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Issue Certificate
+        env:
+          Ali_Key: ${{ secrets.ALIYUN_AK }}
+          Ali_Secret: ${{ secrets.ALIYUN_SK }}
+        run: |
+          curl https://get.acme.sh | sh
+          ~/.acme.sh/acme.sh --register-account --server "$ACME" \
+            --eab-kid "${{ secrets.EAB_ID }}" \
+            --eab-hmac-key "${{ secrets.EAB_KEY }}" -m "${{ vars.EMAIL }}"
+          
+          ~/.acme.sh/acme.sh --issue --dns dns_ali -d "$DOMAIN" -d "*.$DOMAIN" \
+            --server "$ACME" --keylength ec-384 --force --dnssleep 60
+          
+          mkdir -p ./out
+          ~/.acme.sh/acme.sh --install-cert -d "$DOMAIN" --ecc \
+            --key-file ./out/cert.key --fullchain-file ./out/cert.pem
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ssl-cert-package
+          path: ./out/
+          retention-days: 7
+
+      - name: Trigger Deploy
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'ssl_deploy.yml',
+              ref: 'main',
+              inputs: { run_id: '${{ github.run_id }}' }
+            });
+
+```
+
+---
+
+### 3️⃣ 部署任务：`.github/workflows/ssl_deploy.yml`
+
+```yaml
+name: "SSL: 2.Deploy"
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      DOMAIN: "${{ vars.DOMAIN_MAIN }}"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Cert
+        uses: actions/download-artifact@v4
+        with:
+          name: ssl-cert-package
+          path: ./certs
+          run-id: ${{ github.event.inputs.run_id }}
+          github-token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Aliyun ESA
+        env:
+          ALICLOUD_AK: ${{ secrets.ALIYUN_AK }}
+          ALICLOUD_SK: ${{ secrets.ALIYUN_SK }}
+          SITE_IDS: ${{ secrets.ESA_SITE_ID }}
+        run: |
+          curl -L https://aliyuncli.alicdn.com/aliyun-cli-linux-latest-amd64.tgz | tar -xz
+          sudo mv aliyun /usr/local/bin/
+          aliyun configure set --access-key-id "$ALICLOUD_AK" --access-key-secret "$ALICLOUD_SK" --region "cn-hangzhou"
+          
+          NAME="${DOMAIN}_$(date +%Y%m%d_%H%M%S)"
+          CID=$(aliyun cas UploadUserCertificate --Cert "$(cat ./certs/cert.pem)" --Key "$(cat ./certs/cert.key)" --Name "$NAME" | jq -r '.CertId')
+          
+          IFS=',' read -r -a ids <<< "$SITE_IDS"
+          for sid in "${ids[@]}"; do
+            sid=$(echo $sid | xargs)
+            for oid in $(aliyun esa ListCertificates --SiteId "$sid" | jq -r '.Result[].Id // empty'); do
+              aliyun esa DeleteCertificate --SiteId "$sid" --Id "$oid" || true
+            done
+            sleep 2
+            aliyun esa SetCertificate --SiteId "$sid" --Type cas --CasId "$CID"
+          done
+
+      - name: Tencent SSL
+        env:
+          TENCENT_AK: ${{ secrets.TENCENT_AK }}
+          TENCENT_SK: ${{ secrets.TENCENT_SK }}
+        run: |
+          pip install requests
+          python3 - <<'EOF'
+          import requests, os, hashlib, hmac, json, time
+          from datetime import datetime
+          ak, sk, dom = os.environ["TENCENT_AK"], os.environ["TENCENT_SK"], os.environ["DOMAIN"]
+          with open("./certs/cert.pem") as f: pub = f.read()
+          with open("./certs/cert.key") as f: pri = f.read()
+          name = f"{dom}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+          def sign(key, msg): return hmac.new(key, msg.encode(), hashlib.sha256).digest()
+          ts = int(time.time())
+          dt = datetime.utcfromtimestamp(ts).strftime("%Y-%m-%d")
+          body = {"CertificatePublicKey": pub, "CertificatePrivateKey": pri, "Alias": name, "Repeatable": True}
+          p = json.dumps(body)
+          can = f"POST\n/\n\ncontent-type:application/json; charset=utf-8\nhost:ssl.tencentcloudapi.com\nx-tc-action:uploadcertificate\n\ncontent-type;host;x-tc-action\n{hashlib.sha256(p.encode()).hexdigest()}"
+          s = f"TC3-HMAC-SHA256\n{ts}\n{dt}/ssl/tc3_request\n{hashlib.sha256(can.encode()).hexdigest()}"
+          sig = hmac.new(sign(sign(sign(("TC3"+sk).encode(), dt), "ssl"), "tc3_request"), s.encode(), hashlib.sha256).hexdigest()
+          h = {"Authorization": f"TC3-HMAC-SHA256 Credential={ak}/{dt}/ssl/tc3_request, SignedHeaders=content-type;host;x-tc-action, Signature={sig}", "Content-Type": "application/json; charset=utf-8", "Host": "ssl.tencentcloudapi.com", "X-TC-Action": "UploadCertificate", "X-TC-Timestamp": str(ts), "X-TC-Version": "2019-12-05"}
+          r = requests.post("https://ssl.tencentcloudapi.com", headers=h, json=body).json()
+          if "Error" in r.get("Response", {}): print(r); exit(1)
+          print(f"Tencent ID: {r['Response']['CertificateId']}")
+          EOF
+
+      - name: Server Deploy
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "./certs/*"
+          target: "${{ vars.SERVER_CERT_PATH }}"
+          strip_components: 1
+
+      - name: Server Restart
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: ${{ vars.RESTART_CMD }}
+
+```
+
 
 ## 证书文件
 
