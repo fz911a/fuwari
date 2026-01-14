@@ -47,21 +47,28 @@ lang: ''
 
 ### GitHub Secrets
 
-需要在 GitHub 仓库中配置以下 Secrets：
+在 GitHub 仓库 `Settings > Secrets and variables > Actions > Variables` 中添加：
 
-| Secret 名称 | 用途说明 |
+| 变量名 | 说明 | 示例 |
+| --- | --- | --- |
+| `DOMAIN_MAIN` | 申请证书的主域名 | `example.com` |
+| `DOMAIN_CHECK` | 用于过期检测的地址 | `www.example.com` |
+| `EMAIL` | ACME 注册邮箱 | `admin@example.com` |
+| `SERVER_CERT_PATH` | 服务器存放证书路径 | `/etc/caddy/ssl/` |
+| `RESTART_CMD` | 服务器重启网关命令 | `docker restart caddy` |
+
+
+在 `Actions > Secrets` 中添加：
+
+| Secret 名 | 说明 |
 | --- | --- |
-| `ALIYUN_AK` | 阿里云 AccessKey ID  |
-| `ALIYUN_SK` | 阿里云 AccessKey Secret |
-| `TENCENT_AK` | 腾讯云 SecretId |
-| `TENCENT_SK` | 腾讯云 SecretKey |
-| `LITE_SSL_EAB_ID` | LiteSSL 提供的 EAB KID |
-| `LITE_SSL_EAB_KEY` | LiteSSL 提供的 EAB HMAC Key |
+| `ALIYUN_AK / SK` | 阿里云访问密钥 |
+| `TENCENT_AK / SK` | 腾讯云访问密钥 |
+| `EAB_ID / EAB_KEY` | LiteSSL 或其他商家的 EAB 凭据 |
 | `ESA_SITE_ID` | 阿里云 ESA 站点 ID |
-| `SSH_HOST_BJ` | 服务器 IP 地址 |
-| `SSH_USER` | 服务器登录用户名 |
-| `SSH_KEY_BJ` | 服务器 SSH 私钥 |
-| `PAT_TOKEN` | 具有 `repo` 权限的个人访问令牌 (用于跨任务触发) |
+| `SSH_HOST / USER / KEY` | 服务器登录凭据 (建议使用 Key 登录) |
+| `PAT_TOKEN` | 具有 `repo` 权限的个人访问令牌 |
+
 
 ### 环境配置
 
