@@ -13,34 +13,42 @@ lang: ''
 
 ## 项目概述
 
-这是一个使用 GitHub Actions 自动化的证书管理项目，通过以下方式实现：
+本项目利用 GitHub Actions 强大的工作流能力，集成了以下功能：
 
-- 📜 **自动申请证书** - 使用 acme.sh 和 LiteSSL ACME 服务自动申请 SSL 证书
-- 🔐 **DNS 验证** - 使用阿里云 DNS 作为验证方式
-- 📦 **制品管理** - 自动构建和上传证书包为 GitHub Artifacts
-- 🚀 **自动部署** - 证书申请成功后自动触发部署工作流
+* 📜 **自动申请证书** - 使用 `acme.sh` 和 LiteSSL ACME 服务（支持 EAB 注册）。
+* 🔐 **DNS 验证** - 自动化完成阿里云 DNS 挑战（DNS-01 Challenge）。
+* 📦 **制品管理** - 证书签发后自动打包为 Artifacts，支持追溯与手动下载。
+* 🚀 **多端部署** - 联动分发至阿里云 ESA、腾讯云证书中心及服务器。
 
 ## 工作流程
 
-### 1. SSL 证书申请工作流 (`ssl_issue_lvcdy.yml`)
+系统由三个相互关联的工作流组成：
 
-**触发方式：** 手动触发 (Workflow Dispatch)
+### 1. 证书监测 (`ssl_check.yml`)
 
-**工作步骤：**
+**触发方式：** 每周一凌晨定时执行或手动触发。
 
-1. **检出代码** - 检出仓库代码
-2. **申请证书** - 使用 acme.sh 从 LiteSSL 申请证书
-   - 支持通配符域名 `*.lvcdy.cn`
-   - 使用 EC-384 加密
-   - 阿里云 DNS 自动验证
-3. **上传制品** - 将生成的证书文件上传为 GitHub Artifacts
-   - `cert.key` - 私钥文件
-   - `cert.pem` - 完整证书链
-4. **触发部署** - 自动触发部署工作流 `ssl_deploy_lvcdy.yml`
+**核心逻辑：** 远程连接服务器获取证书剩余有效期。若不足 20 天，则自动触发申请工作流。
 
-### 2. 证书部署工作流 (待配置)
+### 2. 证书申请 (`ssl_issue.yml`)
 
-部署工作流 `ssl_deploy_lvcdy.yml` 由证书申请工作流自动触发。
+**触发方式：** 由监测任务自动触发或手动触发。
+
+**核心步骤：**
+
+1. **环境准备**：安装 `acme.sh` 并通过 EAB 注册账户。
+2. **执行签发**：调用阿里云 DNS 验证签发 **ECC-384** 加密证书。
+3. **上传制品**：将 `cert.key` 和 `cert.pem` 上传至 GitHub 仓库。
+4. **触发部署**：证书就绪后，唤起部署任务。
+
+### 3. 自动化部署 (`ssl_deploy.yml`)
+
+**触发方式：** 由申请任务自动触发。
+
+**核心步骤：**
+
+1. **多云分发**：自动推送到阿里云 ESA 站点并绑定，同时上传至腾讯云 SSL 证书中心。
+2. **物理服务器**：通过 SSH/SCP 将证书同步至服务器指定目录并重启网关服务（如 Caddy/Nginx）。
 
 ## 配置要求
 
@@ -69,40 +77,7 @@ lang: ''
 | `PAT_TOKEN` | 具有 `repo` 权限的个人访问令牌 |
 
 
-### 环境配置
-
-- **ACME 服务器** - LiteSSL: `https://acme.litessl.com/acme/v2/directory`
-- **域名** - `*.lvcdy.cn`
-- **证书密钥长度** - EC-384
-- **验证方式** - DNS (Ali DNS)
-
-## 使用指南
-
-### 手动触发证书申请
-
-1. 进入 GitHub 仓库
-2. 点击 **Actions** 标签
-3. 选择 **"SSL Issue: lvcdy.cn"** 工作流
-4. 点击 **Run workflow** 按钮
-
-### 查看证书文件
-
-1. 工作流完成后，进入 Run Details
-2. 滚动到 **Artifacts** 部分
-3. 下载 `lvcdy-cert-package` 文件包
-
-## 文件说明
-
-```
-cert-_update/
-├── .github/
-│   └── workflows/
-│       ├── ssl_issue_lvcdy.yml      # 证书申请工作流
-│       └── ssl_deploy_lvcdy.yml     # 证书部署工作流 (待创建)
-├── LICENSE                          # 许可证文件
-└── README.md                        # 项目文档
-```
----
+## 核心代码参考
 
 ### 1️⃣ 监测任务：`.github/workflows/ssl_check.yml`
 
