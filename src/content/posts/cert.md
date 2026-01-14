@@ -329,7 +329,6 @@ A: 修改 `ssl_issue_lvcdy.yml` 中的以下行：
 
 ## 相关资源
 
-- [项目地址](https://github.com/lvcdy/cert)
 - [acme.sh 文档](https://github.com/acmesh-official/acme.sh)
 - [LiteSSL ACME](https://acme.litessl.com/)
 - [阿里云 DNS API](https://help.aliyun.com/zh/dns/)
