@@ -158,11 +158,11 @@ const bannerOffset =
 		<link rel="alternate" type="application/rss+xml" title={profileConfig.name} href={`${Astro.site}rss.xml`}/>
 
 		{umamiConfig.enable && umamiConfig.baseUrl && umamiConfig.shareId && (
-			<script defer src={`${umamiConfig.baseUrl.replace(/\/+$/, '')}/script.js`} data-website-id={umamiConfig.shareId}></script>
+			<script is:inline defer src={`${umamiConfig.baseUrl.replace(/\/+$/, '')}/script.js`} data-website-id={umamiConfig.shareId}></script>
 		)}
 
 		<!-- Text color adaptive script -->
-		<script define:vars={{enableAutoDetect: textColorConfig.enableAutoDetect, lightModeTextColor: textColorConfig.lightModeTextColor, darkModeTextColor: textColorConfig.darkModeTextColor, threshold: textColorConfig.threshold}}>
+		<script is:inline define:vars={{enableAutoDetect: textColorConfig.enableAutoDetect, lightModeTextColor: textColorConfig.lightModeTextColor, darkModeTextColor: textColorConfig.darkModeTextColor, threshold: textColorConfig.threshold}}>
 			import { applyAdaptiveTextColor } from '../utils/text-color';
 			import { initializePerformanceMonitoring, enableImageLazyLoading } from '../utils/performance';
 

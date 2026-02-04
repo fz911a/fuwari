@@ -25,6 +25,11 @@ interface FirstInputEntry extends PerformanceEntry {
 	processingDuration?: number;
 }
 
+interface PerformanceNavigationTiming extends PerformanceEntry {
+	fetchStart: number;
+	responseStart: number;
+}
+
 const metrics: PerformanceMetrics = {
 	fcp: undefined,
 	lcp: undefined,
@@ -100,9 +105,14 @@ export const initializePerformanceMonitoring = () => {
 	}
 
 	// 获取 Time to First Byte
-	if ("performance" in window && "timing" in window.performance) {
-		const timing = window.performance.timing;
-		metrics.ttfb = Math.round(timing.responseStart - timing.fetchStart);
+	if ("performance" in window && "getEntriesByType" in window.performance) {
+		const navigationEntries = window.performance.getEntriesByType(
+			"navigation",
+		) as PerformanceNavigationTiming[];
+		if (navigationEntries.length > 0) {
+			const navEntry = navigationEntries[0];
+			metrics.ttfb = Math.round(navEntry.responseStart - navEntry.fetchStart);
+		}
 	}
 
 	// 页面卸载时报告指标
