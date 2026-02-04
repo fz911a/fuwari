@@ -47,7 +47,7 @@ export const navBarConfig: NavBarConfig = {
 		LinkPreset.About,
 		{
 			name: "状态",
-			url: "https://stats.lvcdy.cn", // Internal links should not include the base path, as it is automatically added
+			url: "https://status.lvcdy.cn", // Internal links should not include the base path, as it is automatically added
 			external: true, // Show an external link icon and will open in a new tab
 		},
 	],
@@ -100,3 +100,5 @@ export const umamiConfig: UmamiConfig = {
 	// Optional: timezone for share pages or reporting
 	timezone: "Asia/Shanghai",
 };
+// Background image configuration
+export const backgroundUrl = "https://t.alcy.cc/ycy";

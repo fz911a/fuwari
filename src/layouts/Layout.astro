@@ -4,7 +4,12 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
 import ConfigCarrier from "@components/ConfigCarrier.astro";
-import { profileConfig, siteConfig, umamiConfig } from "@/config";
+import {
+	backgroundUrl,
+	profileConfig,
+	siteConfig,
+	umamiConfig,
+} from "@/config";
 import {
 	AUTO_MODE,
 	BANNER_HEIGHT,
@@ -167,7 +172,16 @@ const bannerOffset =
 	bannerOffset,
 	'banner-height-home': `${BANNER_HEIGHT_HOME}vh`,
 	'banner-height': `${BANNER_HEIGHT}vh`,
+	'bg-url': `url('${backgroundUrl}')`,
 }}>
+html {
+	height: 100%;
+	background-image: var(--bg-url);
+	background-attachment: fixed;
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+}
 @tailwind components;
 @layer components {
 	.enable-banner.is-home #banner-wrapper {
