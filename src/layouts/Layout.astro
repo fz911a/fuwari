@@ -89,6 +89,10 @@ const bannerOffset =
 		<meta charset="UTF-8" />
 		<meta name="description" content={description || pageTitle}>
 		<meta name="author" content={profileConfig.name}>
+		<!-- 性能优化：添加预连接和预加载 -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+		<link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+		<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700">
 
 		<meta property="og:site_name" content={siteConfig.title}>
 		<meta property="og:url" content={Astro.url}>
@@ -160,6 +164,7 @@ const bannerOffset =
 		<!-- Text color adaptive script -->
 		<script define:vars={{enableAutoDetect: textColorConfig.enableAutoDetect, lightModeTextColor: textColorConfig.lightModeTextColor, darkModeTextColor: textColorConfig.darkModeTextColor, threshold: textColorConfig.threshold}}>
 			import { applyAdaptiveTextColor } from '../utils/text-color';
+			import { initializePerformanceMonitoring, enableImageLazyLoading } from '../utils/performance';
 
 			if (enableAutoDetect) {
 				document.addEventListener('DOMContentLoaded', () => {
@@ -173,6 +178,15 @@ const bannerOffset =
 							threshold,
 						});
 					}
+					// 初始化性能监控
+					initializePerformanceMonitoring();
+					enableImageLazyLoading();
+				});
+			} else {
+				// 即使未启用文字自适应，仍然初始化性能监控
+				document.addEventListener('DOMContentLoaded', () => {
+					initializePerformanceMonitoring();
+					enableImageLazyLoading();
 				});
 			}
 		</script>

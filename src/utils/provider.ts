@@ -21,6 +21,9 @@ const PROVIDER_CONFIGS: ProviderConfig[] = [
 	},
 ];
 
+// 缓存检测结果，避免重复请求
+let providerCache: { name: string; url: string } | null = null;
+
 export const detectProvider = (headerKeys: string[], serverHeader: string) => {
 	for (const config of PROVIDER_CONFIGS) {
 		const matchesHeader = config.headerPatterns.some((p) =>
@@ -61,6 +64,17 @@ export const fetchAndDetectProvider = async (
 	proName: HTMLElement | null,
 	proBox: HTMLElement | null,
 ) => {
+	// 返回缓存的结果
+	if (providerCache) {
+		updateProviderDisplay(
+			proName,
+			proBox,
+			providerCache.name,
+			providerCache.url,
+		);
+		return;
+	}
+
 	try {
 		const res = await fetch(window.location.href, {
 			method: "HEAD",
@@ -73,8 +87,10 @@ export const fetchAndDetectProvider = async (
 		);
 
 		const provider = detectProvider(headerKeys, serverHeader);
+		providerCache = provider; // 缓存结果
 		updateProviderDisplay(proName, proBox, provider.name, provider.url);
-	} catch (_error) {
+	} catch (error) {
+		console.warn("Failed to detect provider:", error);
 		if (proName) proName.innerText = "Edge Service";
 	}
 };

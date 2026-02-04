@@ -4,13 +4,19 @@
     /* Adaptive text color based on background brightness */
     html {
         color: var(--adaptive-text-color);
+        /* 性能优化：启用 GPU 加速 */
+        will-change: scroll-position;
     }
     
+    /* 性能优化：优化转换性能 */
     .card-base {
         @apply rounded-[var(--radius-large)] overflow-hidden bg-[var(--card-bg)] transition backdrop-blur-sm;
+        will-change: transform;
     }
     h1, h2, h3, h4, h5, h6, p, a, span, li, ul, ol, blockquote, code, pre, table, th, td, strong {
         @apply transition;
+        /* 性能优化：避免不必要的重排 */
+        contain: content;
     }
     .card-shadow {
         @apply drop-shadow-[0_2px_4px_rgba(0,0,0,0.005)]

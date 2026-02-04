@@ -4,6 +4,7 @@ import { profileConfig } from "../config";
 import { fetchAndDetectProvider } from "../utils/provider";
 
 const currentYear = new Date().getFullYear();
+const isBuildTime = import.meta.env.SSR; // 判断是否在构建时执行
 ---
 
 <div class="border-t border-white/10 my-10 border-dashed mx-10 lg:mx-32"></div>

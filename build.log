@@ -1,0 +1,102 @@
+
+> fuwari@0.0.1 build /workspaces/fuwari
+> astro build && pagefind --site dist
+
+17:53:03 [content] Syncing content
+17:53:03 [content] Synced content
+17:53:03 [types] Generated 321ms
+17:53:03 [build] output: "static"
+17:53:03 [build] mode: "static"
+17:53:03 [build] directory: /workspaces/fuwari/dist/
+17:53:03 [build] Collecting build info...
+17:53:03 [build] ✓ Completed in 476ms.
+17:53:03 [build] Building static entrypoints...
+17:53:08 [vite] ✓ built in 5.49s
+17:53:08 [build] ✓ Completed in 5.56s.
+
+ building client (vite) 
+17:53:08 [vite] transforming...
+17:53:09 [vite] ✓ 168 modules transformed.
+17:53:10 [vite] rendering chunks...
+17:53:11 [vite] computing gzip size...
+17:53:11 [vite] dist/_astro/ec.g1fg5.js                                               0.94 kB
+17:53:11 [vite] dist/_astro/Layout.DSulWsr7.css                                       4.42 kB │ gzip:  1.43 kB
+17:53:11 [vite] dist/_astro/Layout.omPQcCVA.css                                      14.04 kB │ gzip:  2.61 kB
+17:53:11 [vite] dist/_astro/ec.d1dr8.css                                             19.55 kB │ gzip:  4.37 kB
+17:53:11 [vite] dist/_astro/url-utils.DHk-PMfS.js                                     0.29 kB │ gzip:  0.19 kB
+17:53:11 [vite] dist/_astro/lifecycle.ruHHkI0d.js                                     0.54 kB │ gzip:  0.34 kB
+17:53:11 [vite] dist/_astro/input.Cm05eEiF.js                                         0.83 kB │ gzip:  0.46 kB
+17:53:11 [vite] dist/_astro/setting-utils.M7jzHjNM.js                                 0.99 kB │ gzip:  0.49 kB
+17:53:11 [vite] dist/_astro/SwupScriptsPlugin.HEe14F6q.js                             1.10 kB │ gzip:  0.61 kB
+17:53:11 [vite] dist/_astro/preload-helper.BhLMWRjL.js                                1.11 kB │ gzip:  0.64 kB
+17:53:11 [vite] dist/_astro/client.svelte.XFq0kuit.js                                 1.13 kB │ gzip:  0.62 kB
+17:53:11 [vite] dist/_astro/index.modern.CakIiLFM.js                                  1.77 kB │ gzip:  0.90 kB
+17:53:11 [vite] dist/_astro/page.D8Hpk5SO.js                                          2.14 kB │ gzip:  1.00 kB
+17:53:11 [vite] dist/_astro/DisplaySettings.Cc3QLIe7.js                               2.16 kB │ gzip:  1.17 kB
+17:53:11 [vite] dist/_astro/SwupHeadPlugin.B88uC97e.js                                2.57 kB │ gzip:  1.24 kB
+17:53:11 [vite] dist/_astro/LightDarkSwitch.Ci3Rw6Od.js                               3.18 kB │ gzip:  1.32 kB
+17:53:11 [vite] dist/_astro/ArchivePanel.kPFvUXoO.js                                  3.60 kB │ gzip:  1.54 kB
+17:53:11 [vite] dist/_astro/each.DzxF3Jw1.js                                          3.73 kB │ gzip:  1.80 kB
+17:53:11 [vite] dist/_astro/Search.Df74vcDY.js                                        4.10 kB │ gzip:  1.77 kB
+17:53:11 [vite] dist/_astro/SwupA11yPlugin.DqBRVKN-.js                                5.21 kB │ gzip:  2.06 kB
+17:53:11 [vite] dist/_astro/SwupPreloadPlugin.BzeGk-hd.js                             6.01 kB │ gzip:  2.25 kB
+17:53:11 [vite] dist/_astro/zh_TW.CIGGMFgY.js                                         7.50 kB │ gzip:  2.58 kB
+17:53:11 [vite] dist/_astro/SwupScrollPlugin.C8Kp_a8q.js                              7.86 kB │ gzip:  2.31 kB
+17:53:11 [vite] dist/_astro/translation.CnQtVOBP.js                                   8.27 kB │ gzip:  3.86 kB
+17:53:11 [vite] dist/_astro/Layout.astro_astro_type_script_index_0_lang.CcEyGULy.js  16.55 kB │ gzip:  5.34 kB
+17:53:11 [vite] dist/_astro/Icon.DCmDlaiE.js                                         20.64 kB │ gzip:  7.94 kB
+17:53:11 [vite] dist/_astro/Swup.FoF4BFnt.js                                         20.78 kB │ gzip:  6.96 kB
+17:53:11 [vite] dist/_astro/render.CnOCQXE7.js                                       28.54 kB │ gzip: 11.15 kB
+17:53:11 [vite] dist/_astro/Layout.astro_astro_type_script_index_1_lang.B2TkI2ZD.js  31.15 kB │ gzip: 14.44 kB
+17:53:11 [vite] dist/_astro/photoswipe.esm.Ct2-qzgb.js                               60.10 kB │ gzip: 17.16 kB
+17:53:11 [vite] ✓ built in 3.33s
+
+ generating static routes 
+17:53:12 ▶ src/pages/about.astro
+17:53:12   └─ /about/index.html (+26ms) 
+17:53:12 ▶ src/pages/archive.astro
+17:53:12   └─ /archive/index.html (+8ms) 
+17:53:12 ▶ src/pages/posts/[...slug].astro
+17:53:12   ├─ /posts/my-first-blog-post/index.html (+7ms) 
+17:53:12   ├─ /posts/cert/index.html (+8ms) 
+17:53:12   └─ /posts/panel/index.html (+6ms) 
+17:53:12 λ src/pages/robots.txt.ts
+17:53:12   └─ /robots.txt (+2ms) 
+17:53:12 λ src/pages/rss.xml.ts
+17:53:12   └─ /rss.xml (+34ms) 
+17:53:12 ▶ src/pages/[...page].astro
+17:53:12   └─ /index.html (+11ms) 
+17:53:12 ✓ Completed in 270ms.
+
+ generating optimized images 
+17:53:12   ▶ /_astro/headphoto.BxoDHOfk_Z1DSD2m.webp (reused cache entry) (+1ms) (1/1)
+17:53:12 ✓ Completed in 2ms.
+
+17:53:12 [@astrojs/sitemap] `sitemap-index.xml` created at `dist`
+17:53:12 [build] 6 page(s) built in 9.69s
+17:53:12 [build] Complete!
+
+Running Pagefind v1.4.0 (Extended)
+Running from: "/workspaces/fuwari"
+Source:       "dist"
+Output:       "dist/pagefind"
+
+[Walking source directory]
+Found 6 files matching **/*.{html}
+
+[Parsing files]
+Found a data-pagefind-body element on the site.
+↳ Ignoring pages without this tag.
+
+[Reading languages]
+Discovered 1 language: zh-cn
+
+[Building search indexes]
+Total: 
+  Indexed 1 language
+  Indexed 4 pages
+  Indexed 814 words
+  Indexed 0 filters
+  Indexed 0 sorts
+
+Finished in 0.858 seconds

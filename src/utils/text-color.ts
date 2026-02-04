@@ -16,12 +16,21 @@ export const defaultColorConfig: ColorConfig = {
 	threshold: 128,
 };
 
+// 缓存图像亮度计算结果
+const brightnessCache = new Map<string, number>();
+
 /**
- * Calculate image brightness
+ * Calculate image brightness with caching
  * @param imageUrl - Image URL to analyze
  * @returns Brightness value (0-255)
  */
 export const getImageBrightness = (imageUrl: string): Promise<number> => {
+	// 检查缓存
+	const cached = brightnessCache.get(imageUrl);
+	if (cached !== undefined) {
+		return Promise.resolve(cached);
+	}
+
 	return new Promise((resolve) => {
 		const img = new Image();
 		img.crossOrigin = "anonymous";
@@ -29,8 +38,8 @@ export const getImageBrightness = (imageUrl: string): Promise<number> => {
 		img.onload = () => {
 			try {
 				const canvas = document.createElement("canvas");
-				canvas.width = img.width;
-				canvas.height = img.height;
+				canvas.width = Math.min(img.width, 200); // 限制最大尺寸以提高性能
+				canvas.height = Math.min(img.height, 200);
 
 				const ctx = canvas.getContext("2d");
 				if (!ctx) {
@@ -38,37 +47,47 @@ export const getImageBrightness = (imageUrl: string): Promise<number> => {
 					return;
 				}
 
-				ctx.drawImage(img, 0, 0);
+				ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
 				// Sample center area of image for better accuracy
+				const sampleX = Math.floor(canvas.width * 0.25);
+				const sampleY = Math.floor(canvas.height * 0.25);
+				const sampleWidth = Math.floor(canvas.width * 0.5);
+				const sampleHeight = Math.floor(canvas.height * 0.5);
+
 				const imageData = ctx.getImageData(
-					Math.floor(canvas.width * 0.25),
-					Math.floor(canvas.height * 0.25),
-					Math.floor(canvas.width * 0.5),
-					Math.floor(canvas.height * 0.5),
+					sampleX,
+					sampleY,
+					sampleWidth,
+					sampleHeight,
 				);
 
 				const data = imageData.data;
 				let brightness = 0;
+				let pixelCount = 0;
 
-				// Calculate average brightness
+				// Calculate average brightness using optimized loop
 				for (let i = 0; i < data.length; i += 4) {
 					const r = data[i];
 					const g = data[i + 1];
 					const b = data[i + 2];
 
-					// Using luminance formula
+					// Using luminance formula: 0.299*R + 0.587*G + 0.114*B
 					brightness += (r * 299 + g * 587 + b * 114) / 1000;
+					pixelCount++;
 				}
 
-				brightness = Math.floor(brightness / (data.length / 4));
+				brightness = Math.floor(brightness / pixelCount);
+				brightnessCache.set(imageUrl, brightness);
 				resolve(brightness);
-			} catch {
+			} catch (error) {
+				console.warn("Failed to calculate image brightness:", error);
 				resolve(128);
 			}
 		};
 
 		img.onerror = () => {
+			console.warn("Failed to load image for brightness detection:", imageUrl);
 			resolve(128);
 		};
 
