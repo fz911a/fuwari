@@ -100,5 +100,18 @@ export const umamiConfig: UmamiConfig = {
 	// Optional: timezone for share pages or reporting
 	timezone: "Asia/Shanghai",
 };
+
+// Text color adaptive configuration
+export const textColorConfig = {
+	// Enable automatic text color adjustment based on background brightness
+	enableAutoDetect: true,
+	// Light mode text color (used for bright backgrounds)
+	lightModeTextColor: "rgb(30, 30, 30)",
+	// Dark mode text color (used for dark backgrounds)
+	darkModeTextColor: "rgb(245, 245, 245)",
+	// Brightness threshold (0-255)
+	threshold: 128,
+};
+
 // Background image configuration
 export const backgroundUrl = "https://t.alcy.cc/ycy";

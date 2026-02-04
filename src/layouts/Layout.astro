@@ -8,6 +8,7 @@ import {
 	backgroundUrl,
 	profileConfig,
 	siteConfig,
+	textColorConfig,
 	umamiConfig,
 } from "@/config";
 import {
@@ -156,6 +157,26 @@ const bannerOffset =
 			<script defer src={`${umamiConfig.baseUrl.replace(/\/+$/, '')}/script.js`} data-website-id={umamiConfig.shareId}></script>
 		)}
 
+		<!-- Text color adaptive script -->
+		<script define:vars={{enableAutoDetect: textColorConfig.enableAutoDetect, lightModeTextColor: textColorConfig.lightModeTextColor, darkModeTextColor: textColorConfig.darkModeTextColor, threshold: textColorConfig.threshold}}>
+			import { applyAdaptiveTextColor } from '../utils/text-color';
+
+			if (enableAutoDetect) {
+				document.addEventListener('DOMContentLoaded', () => {
+					const bgUrl = document.documentElement.style.getPropertyValue('--bg-url');
+					if (bgUrl) {
+						const url = bgUrl.slice(5, -2); // Remove url(' and ')
+						applyAdaptiveTextColor(url, {
+							lightModeTextColor,
+							darkModeTextColor,
+							enableAutoDetect,
+							threshold,
+						});
+					}
+				});
+			}
+		</script>
+
 	</head>
 	<body class=" min-h-screen transition " class:list={[{"lg:is-home": isHomePage, "enable-banner": enableBanner}]}
 		  data-overlayscrollbars-initialize
@@ -181,6 +202,7 @@ html {
 	background-size: cover;
 	background-position: center;
 	background-repeat: no-repeat;
+	--adaptive-text-color: rgb(30, 30, 30); /* Default fallback */
 }
 @tailwind components;
 @layer components {

@@ -1,6 +1,11 @@
 @tailwind components;
 
 @layer components {
+    /* Adaptive text color based on background brightness */
+    html {
+        color: var(--adaptive-text-color);
+    }
+    
     .card-base {
         @apply rounded-[var(--radius-large)] overflow-hidden bg-[var(--card-bg)] transition backdrop-blur-sm;
     }
