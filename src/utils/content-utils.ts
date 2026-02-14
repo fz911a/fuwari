@@ -90,7 +90,9 @@ export async function getTagList(): Promise<Tag[]> {
 	});
 
 	const countMap = createCountMap(
-		allBlogPosts.flatMap((post) => post.data.tags.map((tag) => ({ tag }))),
+		allBlogPosts.flatMap((post) =>
+			post.data.tags.map((tag: string) => ({ tag })),
+		),
 		(item) => item.tag,
 	);
 
