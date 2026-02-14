@@ -12,8 +12,12 @@ function joinUrl(...parts: string[]): string {
 	return joined.replace(/\/+/g, "/");
 }
 
+export function normalizePostSlug(slugOrId: string): string {
+	return slugOrId.replace(/\.(md|mdx)$/i, "");
+}
+
 export function getPostUrlBySlug(slug: string): string {
-	return url(`/posts/${slug}/`);
+	return url(`/posts/${normalizePostSlug(slug)}/`);
 }
 
 export function getTagUrl(tag: string): string {

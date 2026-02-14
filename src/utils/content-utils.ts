@@ -1,7 +1,7 @@
 import { type CollectionEntry, getCollection } from "astro:content";
 import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
-import { getCategoryUrl } from "@utils/url-utils.ts";
+import { getCategoryUrl, normalizePostSlug } from "@utils/url-utils.ts";
 
 /**
  * Generic function to create a count map from items
@@ -30,7 +30,7 @@ async function getRawSortedPosts() {
 	});
 
 	const sorted = allBlogPosts.sort((a, b) => {
-		// 1. 获取置顶权重 (在 src/content/config.ts 中定义的字段)
+		// 1. 获取置顶权重 (在 src/content.config.ts 中定义的字段)
 		// 默认为 0，数字越大越靠前
 		const stickyA = a.data.sticky ?? 0;
 		const stickyB = b.data.sticky ?? 0;
@@ -51,11 +51,11 @@ export async function getSortedPosts() {
 	const sorted = await getRawSortedPosts();
 
 	for (let i = 1; i < sorted.length; i++) {
-		sorted[i].data.nextSlug = sorted[i - 1].slug;
+		sorted[i].data.nextSlug = normalizePostSlug(sorted[i - 1].id);
 		sorted[i].data.nextTitle = sorted[i - 1].data.title;
 	}
 	for (let i = 0; i < sorted.length - 1; i++) {
-		sorted[i].data.prevSlug = sorted[i + 1].slug;
+		sorted[i].data.prevSlug = normalizePostSlug(sorted[i + 1].id);
 		sorted[i].data.prevTitle = sorted[i + 1].data.title;
 	}
 
@@ -72,7 +72,7 @@ export async function getSortedPostsList(): Promise<PostForList[]> {
 
 	// delete post.body
 	const sortedPostsList = sortedFullPosts.map((post) => ({
-		slug: post.slug,
+		slug: normalizePostSlug(post.id),
 		data: post.data,
 	}));
 

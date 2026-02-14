@@ -1,5 +1,5 @@
 ---
-import type { CollectionEntry } from "astro:content";
+import { type CollectionEntry, render } from "astro:content";
 import path from "node:path";
 import { Icon } from "astro-icon/components";
 import I18nKey from "../i18n/i18nKey";
@@ -41,7 +41,7 @@ const sticky = entry.data.sticky || 0;
 const className = Astro.props.class;
 const hasCover = image !== undefined && image !== null && image !== "";
 const coverWidth = "28%";
-const { remarkPluginFrontmatter } = await entry.render();
+const { remarkPluginFrontmatter } = await render(entry);
 ---
 
 <div class:list={["card-base flex flex-col-reverse md:flex-col w-full rounded-[var(--radius-large)] overflow-hidden relative", className]} style={style}>

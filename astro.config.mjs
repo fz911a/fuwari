@@ -172,12 +172,6 @@ export default defineConfig({
 				},
 			},
 			rollupOptions: {
-				output: {
-					// 优化代码分割
-					manualChunks: {
-						vendor: ["photoswipe", "overlayscrollbars", "@iconify/svelte"],
-					},
-				},
 				onwarn(warning, warn) {
 					// temporarily suppress this warning
 					if (
