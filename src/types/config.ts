@@ -104,3 +104,8 @@ export type UmamiConfig = {
 	shareId: string;
 	timezone: string;
 };
+
+export type BackgroundConfig = {
+	type: "remote" | "public" | "src";
+	src: string;
+};

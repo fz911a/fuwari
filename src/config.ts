@@ -2,6 +2,7 @@ import type {
 	ExpressiveCodeConfig,
 	LicenseConfig,
 	NavBarConfig,
+	BackgroundConfig,
 	ProfileConfig,
 	SiteConfig,
 	UmamiConfig,
@@ -114,4 +115,7 @@ export const textColorConfig = {
 };
 
 // Background image configuration
-export const backgroundUrl = "https://t.alcy.cc/ycy";
+export const backgroundConfig: BackgroundConfig = {
+	type: "remote",
+	src: "https://t.alcy.cc/ycy",
+};
