@@ -1,8 +1,8 @@
 import type {
+	BackgroundConfig,
 	ExpressiveCodeConfig,
 	LicenseConfig,
 	NavBarConfig,
-	BackgroundConfig,
 	ProfileConfig,
 	SiteConfig,
 	UmamiConfig,
