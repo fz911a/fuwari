@@ -243,7 +243,7 @@ html {
 	background-repeat: no-repeat;
 	--adaptive-text-color: rgb(30, 30, 30); /* Default fallback */
 }
-@tailwind components;
+@reference "tailwindcss";
 @layer components {
 	.enable-banner.is-home #banner-wrapper {
 		@apply h-[var(--banner-height-home)] translate-y-[var(--banner-height-extend)]

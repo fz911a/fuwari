@@ -1,4 +1,12 @@
-@tailwind components;
+@import "tailwindcss";
+
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --font-sans: "Roboto", "sans-serif", ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+}
 
 @layer components {
     /* Adaptive text color based on background brightness */
@@ -21,15 +29,18 @@
     .card-shadow {
         @apply drop-shadow-[0_2px_4px_rgba(0,0,0,0.005)]
     }
-    .expand-animation {
+    .expand-animation,
+    .link,
+    .link-lg,
+    .btn-plain.scale-animation {
         @apply relative before:ease-out before:transition active:bg-none hover:before:bg-[var(--btn-plain-bg-hover)] active:before:bg-[var(--btn-plain-bg-active)] z-0
         before:absolute before:rounded-[inherit] before:inset-0 before:scale-[0.85] hover:before:scale-100 before:-z-10
     }
     .link {
-        @apply transition rounded-md p-1 -m-1 expand-animation;
+        @apply transition rounded-md p-1 -m-1;
     }
     .link-lg {
-        @apply transition rounded-md p-1.5 -m-1.5 expand-animation;
+        @apply transition rounded-md p-1.5 -m-1.5;
     }
     .float-panel {
         @apply top-[5.25rem] rounded-[var(--radius-large)] overflow-hidden bg-[var(--float-panel-bg)] transition shadow-xl dark:shadow-none backdrop-blur-sm
@@ -55,7 +66,6 @@
             @apply hover:bg-[var(--btn-plain-bg-hover)] active:bg-[var(--btn-plain-bg-active)]
         }
         &.scale-animation {
-            @apply expand-animation;
             &.current-theme-btn {
                 @apply before:scale-100 before:opacity-100 before:bg-[var(--btn-plain-bg-hover)] text-[var(--primary)]
             }
@@ -88,22 +98,6 @@
         display: none;
     }
 
-    .text-90 {
-        @apply text-black/90 dark:text-white/90
-    }
-    .text-75 {
-        @apply text-black/75 dark:text-white/75
-    }
-    .text-50 {
-        @apply text-black/50 dark:text-white/50
-    }
-    .text-30 {
-        @apply text-black/30 dark:text-white/30
-    }
-    .text-25 {
-        @apply text-black/25 dark:text-white/25
-    }
-
     .meta-icon {
         @apply w-8 h-8 transition rounded-md flex items-center justify-center bg-[var(--btn-regular-bg)]
         text-[var(--btn-content)] mr-2
@@ -121,6 +115,26 @@
     .btn-regular-dark.success {
         @apply bg-[oklch(0.75_0.14_var(--hue))] dark:bg-[oklch(0.75_0.14_var(--hue))]
     }
+}
+
+@utility text-90 {
+    @apply text-black/90 dark:text-white/90;
+}
+
+@utility text-75 {
+    @apply text-black/75 dark:text-white/75;
+}
+
+@utility text-50 {
+    @apply text-black/50 dark:text-white/50;
+}
+
+@utility text-30 {
+    @apply text-black/30 dark:text-white/30;
+}
+
+@utility text-25 {
+    @apply text-black/25 dark:text-white/25;
 }
 
 .custom-md img, #post-cover img {

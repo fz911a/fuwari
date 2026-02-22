@@ -1,8 +1,8 @@
 import sitemap from "@astrojs/sitemap";
 import svelte from "@astrojs/svelte";
-import tailwind from "@astrojs/tailwind";
 import { pluginCollapsibleSections } from "@expressive-code/plugin-collapsible-sections";
 import { pluginLineNumbers } from "@expressive-code/plugin-line-numbers";
+import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 import expressiveCode from "astro-expressive-code";
 import icon from "astro-icon";
@@ -37,9 +37,6 @@ export default defineConfig({
 		},
 	},
 	integrations: [
-		tailwind({
-			nesting: true,
-		}),
 		icon({
 			include: {
 				"fa6-brands": ["*"],
@@ -147,6 +144,7 @@ export default defineConfig({
 		],
 	},
 	vite: {
+		plugins: [tailwindcss()],
 		build: {
 			// 性能优化：减少 Chunk 大小
 			minify: "terser",

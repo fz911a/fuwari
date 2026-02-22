@@ -23,6 +23,8 @@
     }
 }
 
+@reference "tailwindcss";
+
 .os-scrollbar {
     &.scrollbar-auto {
         --os-handle-bg: var(--scrollbar-bg);
