@@ -4,7 +4,10 @@ import { i18n } from "@i18n/translation";
 import Icon from "@iconify/svelte";
 import { url } from "@utils/url-utils.ts";
 import { onMount } from "svelte";
-import type { SearchResult } from "@/global";
+import {
+	getPagefindClient,
+	type SearchResult,
+} from "@utils/pagefind";
 
 let keywordDesktop = "";
 let keywordMobile = "";
@@ -27,7 +30,7 @@ const fakeResult: SearchResult[] = [
 		meta: {
 			title: "If You Want to Test the Search",
 		},
-		excerpt: "Try running <mark>npm build && npm preview</mark> instead.",
+		excerpt: "Try running <mark>pnpm build && pnpm preview</mark> instead.",
 	},
 ];
 
@@ -62,9 +65,10 @@ const search = async (keyword: string, isDesktop: boolean): Promise<void> => {
 
 	try {
 		let searchResults: SearchResult[] = [];
+		const pagefind = getPagefindClient();
 
-		if (import.meta.env.PROD && pagefindLoaded && window.pagefind) {
-			const response = await window.pagefind.search(keyword);
+		if (import.meta.env.PROD && pagefindLoaded && pagefind) {
+			const response = await pagefind.search(keyword);
 			searchResults = await Promise.all(
 				response.results.map((item) => item.data()),
 			);
@@ -89,10 +93,7 @@ const search = async (keyword: string, isDesktop: boolean): Promise<void> => {
 onMount(() => {
 	const initializeSearch = () => {
 		initialized = true;
-		pagefindLoaded =
-			typeof window !== "undefined" &&
-			!!window.pagefind &&
-			typeof window.pagefind.search === "function";
+		pagefindLoaded = !!getPagefindClient();
 		console.log("Pagefind status on init:", pagefindLoaded);
 		if (keywordDesktop) search(keywordDesktop, true);
 		if (keywordMobile) search(keywordMobile, false);
@@ -112,7 +113,7 @@ onMount(() => {
 			console.warn(
 				"Pagefind load error event received. Search functionality will be limited.",
 			);
-			initializeSearch(); // Initialize with pagefindLoaded as false
+			initializeSearch();
 		});
 
 		// Fallback in case events are not caught or pagefind is already loaded by the time this script runs
@@ -121,7 +122,7 @@ onMount(() => {
 				console.log("Fallback: Initializing search after timeout.");
 				initializeSearch();
 			}
-		}, 2000); // Adjust timeout as needed
+		}, 2000);
 	}
 });
 

@@ -10,6 +10,7 @@ import DisplaySettings from "./widget/DisplaySettings.svelte";
 import NavMenuPanel from "./widget/NavMenuPanel.astro";
 
 const className = Astro.props.class;
+const pagefindScriptUrl = url("/pagefind/pagefind.js");
 
 let links: NavBarLink[] = navBarConfig.links.map(
 	(item: NavBarLink | LinkPreset): NavBarLink => {
@@ -20,7 +21,7 @@ let links: NavBarLink[] = navBarConfig.links.map(
 	},
 );
 ---
-<div id="navbar" class="z-50 onload-animation">
+<div id="navbar" data-pagefind-script={pagefindScriptUrl} class="z-50 onload-animation">
     <div class="absolute h-8 left-0 right-0 -top-8 bg-[var(--card-bg)] transition"></div> <!-- used for onload animation -->
     <div class:list={[
         className,
@@ -104,9 +105,21 @@ function loadButtonScript() {
 loadButtonScript();
 </script>
 
-{import.meta.env.PROD && <script is:inline define:vars={{scriptUrl: url('/pagefind/pagefind.js')}}>
+{import.meta.env.PROD && <script>
+import {
+	createFallbackPagefindClient,
+	setPagefindClient,
+} from "@utils/pagefind";
+
 async function loadPagefind() {
+    const navbar = document.getElementById('navbar');
+    const scriptUrl = navbar?.dataset.pagefindScript;
+
     try {
+        if (!scriptUrl) {
+            throw new Error('Pagefind script URL is missing');
+        }
+
         const response = await fetch(scriptUrl, { method: 'HEAD' });
         if (!response.ok) {
             throw new Error(`Pagefind script not found: ${response.status}`);
@@ -114,20 +127,19 @@ async function loadPagefind() {
 
         const pagefind = await import(scriptUrl);
 
-        await pagefind.options({
-            excerptLength: 20
-        });
+        if (typeof pagefind.options === 'function') {
+            await pagefind.options({
+                excerptLength: 20
+            });
+        }
 
-        window.pagefind = pagefind;
+        setPagefindClient(pagefind);
 
         document.dispatchEvent(new CustomEvent('pagefindready'));
         console.log('Pagefind loaded and initialized successfully, event dispatched.');
     } catch (error) {
         console.error('Failed to load Pagefind:', error);
-        window.pagefind = {
-            search: () => Promise.resolve({ results: [] }),
-            options: () => Promise.resolve(),
-        };
+        setPagefindClient(createFallbackPagefindClient());
         document.dispatchEvent(new CustomEvent('pagefindloaderror'));
         console.log('Pagefind load error, event dispatched.');
     }
