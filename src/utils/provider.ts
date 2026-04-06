@@ -67,7 +67,11 @@ const PROVIDER_CONFIGS: ProviderConfig[] = [
 	{
 		name: "Google Cloud CDN",
 		url: "https://cloud.google.com/cdn",
-		headerPatterns: ["x-cloud-trace-context", "x-goog-generation", "x-goog-hash"],
+		headerPatterns: [
+			"x-cloud-trace-context",
+			"x-goog-generation",
+			"x-goog-hash",
+		],
 		headerValuePatterns: ["google"],
 		serverPatterns: ["google frontend", "gfe"],
 	},
@@ -111,7 +115,7 @@ export const detectProvider = (
 		);
 		const matchesHeaderValue =
 			(config.headerValuePatterns || []).length > 0
-				? config.headerValuePatterns!.some((p) => headerValuesText.includes(p))
+				? config.headerValuePatterns?.some((p) => headerValuesText.includes(p))
 				: false;
 
 		if (matchesHeader || matchesServer || matchesHeaderValue) {
