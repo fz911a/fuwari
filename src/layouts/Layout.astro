@@ -191,8 +191,8 @@ if (backgroundConfig.type === "src") {
 			import { applyAdaptiveTextColor } from '../utils/text-color';
 			import { initializePerformanceMonitoring, enableImageLazyLoading } from '../utils/performance';
 
-			if (enableAutoDetect) {
-				document.addEventListener('DOMContentLoaded', () => {
+			const initializeClientFeatures = () => {
+				if (enableAutoDetect) {
 					const bgUrl = document.documentElement.style.getPropertyValue('--bg-url');
 					if (bgUrl) {
 						const url = bgUrl.slice(5, -2); // Remove url(' and ')
@@ -203,16 +203,16 @@ if (backgroundConfig.type === "src") {
 							threshold,
 						});
 					}
-					// 初始化性能监控
-					initializePerformanceMonitoring();
-					enableImageLazyLoading();
-				});
+				}
+
+				initializePerformanceMonitoring();
+				enableImageLazyLoading();
+			};
+
+			if (document.readyState === 'loading') {
+				document.addEventListener('DOMContentLoaded', initializeClientFeatures, { once: true });
 			} else {
-				// 即使未启用文字自适应，仍然初始化性能监控
-				document.addEventListener('DOMContentLoaded', () => {
-					initializePerformanceMonitoring();
-					enableImageLazyLoading();
-				});
+				initializeClientFeatures();
 			}
 		</script>
 

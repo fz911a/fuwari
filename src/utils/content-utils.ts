@@ -23,11 +23,15 @@ function createCountMap<T>(
 	return countMap;
 }
 
-// // Retrieve posts and sort them by sticky status and publication date
-async function getRawSortedPosts() {
-	const allBlogPosts = await getCollection("posts", ({ data }) => {
+async function getPublishedPosts() {
+	return getCollection("posts", ({ data }) => {
 		return import.meta.env.PROD ? data.draft !== true : true;
 	});
+}
+
+// // Retrieve posts and sort them by sticky status and publication date
+async function getRawSortedPosts() {
+	const allBlogPosts = await getPublishedPosts();
 
 	const sorted = allBlogPosts.sort((a, b) => {
 		// 1. 获取置顶权重 (在 src/content.config.ts 中定义的字段)
@@ -50,13 +54,19 @@ async function getRawSortedPosts() {
 export async function getSortedPosts() {
 	const sorted = await getRawSortedPosts();
 
-	for (let i = 1; i < sorted.length; i++) {
-		sorted[i].data.nextSlug = normalizePostSlug(sorted[i - 1].id);
-		sorted[i].data.nextTitle = sorted[i - 1].data.title;
-	}
-	for (let i = 0; i < sorted.length - 1; i++) {
-		sorted[i].data.prevSlug = normalizePostSlug(sorted[i + 1].id);
-		sorted[i].data.prevTitle = sorted[i + 1].data.title;
+	for (let i = 0; i < sorted.length; i++) {
+		const nextPost = sorted[i - 1];
+		const prevPost = sorted[i + 1];
+
+		if (nextPost) {
+			sorted[i].data.nextSlug = normalizePostSlug(nextPost.id);
+			sorted[i].data.nextTitle = nextPost.data.title;
+		}
+
+		if (prevPost) {
+			sorted[i].data.prevSlug = normalizePostSlug(prevPost.id);
+			sorted[i].data.prevTitle = prevPost.data.title;
+		}
 	}
 
 	return sorted;
@@ -85,9 +95,7 @@ export type Tag = {
 };
 
 export async function getTagList(): Promise<Tag[]> {
-	const allBlogPosts = await getCollection<"posts">("posts", ({ data }) => {
-		return import.meta.env.PROD ? data.draft !== true : true;
-	});
+	const allBlogPosts = await getPublishedPosts();
 
 	const countMap = createCountMap(
 		allBlogPosts.flatMap((post) =>
@@ -111,9 +119,7 @@ export type Category = {
 };
 
 export async function getCategoryList(): Promise<Category[]> {
-	const allBlogPosts = await getCollection<"posts">("posts", ({ data }) => {
-		return import.meta.env.PROD ? data.draft !== true : true;
-	});
+	const allBlogPosts = await getPublishedPosts();
 
 	const countMap = createCountMap(allBlogPosts, (post) => {
 		if (!post.data.category) {

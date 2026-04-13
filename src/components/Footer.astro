@@ -85,9 +85,15 @@ const currentYear = new Date().getFullYear();
 <script>
   import { fetchAndDetectProvider } from "../utils/provider";
 
-  document.addEventListener("DOMContentLoaded", () => {
+  const initProviderDetection = () => {
     const proName = document.getElementById("pro-name");
     const proBox = document.getElementById("pro-info");
     fetchAndDetectProvider(proName, proBox);
-  });
+  };
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initProviderDetection, { once: true });
+  } else {
+    initProviderDetection();
+  }
 </script>

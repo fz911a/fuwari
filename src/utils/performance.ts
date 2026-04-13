@@ -38,29 +38,52 @@ const metrics: PerformanceMetrics = {
 	ttfb: undefined,
 };
 
+let monitoringInitialized = false;
+
+function observeEntries(
+	entryType: string,
+	onEntries: (entries: PerformanceEntry[]) => void,
+	errorMessage: string,
+) {
+	try {
+		const observer = new PerformanceObserver((list) => {
+			onEntries(list.getEntries());
+		});
+		observer.observe({ entryTypes: [entryType] });
+	} catch (error) {
+		console.warn(errorMessage, error);
+	}
+}
+
+function hasCollectedMetrics(): boolean {
+	return Object.values(metrics).some((value) => value !== undefined);
+}
+
 /**
  * 初始化性能监控
  */
 export const initializePerformanceMonitoring = () => {
-	// 监听 First Contentful Paint
+	if (monitoringInitialized) {
+		return;
+	}
+	monitoringInitialized = true;
+
 	if ("PerformanceObserver" in window) {
-		try {
-			const paintObserver = new PerformanceObserver((list) => {
-				for (const entry of list.getEntries()) {
+		observeEntries(
+			"paint",
+			(entries) => {
+				for (const entry of entries) {
 					if (entry.name === "first-contentful-paint") {
 						metrics.fcp = Math.round(entry.startTime);
 					}
 				}
-			});
-			paintObserver.observe({ entryTypes: ["paint"] });
-		} catch (e) {
-			console.warn("Failed to observe paint events:", e);
-		}
+			},
+			"Failed to observe paint events:",
+		);
 
-		// 监听 Largest Contentful Paint
-		try {
-			const lcpObserver = new PerformanceObserver((list) => {
-				const entries = list.getEntries();
+		observeEntries(
+			"largest-contentful-paint",
+			(entries) => {
 				const lastEntry = entries[
 					entries.length - 1
 				] as LargestContentfulPaintEntry;
@@ -69,42 +92,35 @@ export const initializePerformanceMonitoring = () => {
 						lastEntry.renderTime || lastEntry.loadTime || 0,
 					);
 				}
-			});
-			lcpObserver.observe({ entryTypes: ["largest-contentful-paint"] });
-		} catch (e) {
-			console.warn("Failed to observe LCP events:", e);
-		}
+			},
+			"Failed to observe LCP events:",
+		);
 
-		// 监听 Cumulative Layout Shift
-		try {
-			const clsObserver = new PerformanceObserver((list) => {
-				for (const entry of list.getEntries()) {
+		observeEntries(
+			"layout-shift",
+			(entries) => {
+				for (const entry of entries) {
 					const layoutEntry = entry as LayoutShiftEntry;
 					if (!(layoutEntry.hadRecentInput ?? false)) {
 						metrics.cls = (metrics.cls || 0) + (layoutEntry.value ?? 0);
 					}
 				}
-			});
-			clsObserver.observe({ entryTypes: ["layout-shift"] });
-		} catch (e) {
-			console.warn("Failed to observe CLS events:", e);
-		}
+			},
+			"Failed to observe CLS events:",
+		);
 
-		// 监听 First Input Delay
-		try {
-			const fidObserver = new PerformanceObserver((list) => {
-				for (const entry of list.getEntries()) {
+		observeEntries(
+			"first-input",
+			(entries) => {
+				for (const entry of entries) {
 					const fidEntry = entry as FirstInputEntry;
 					metrics.fid = Math.round(fidEntry.processingDuration ?? 0);
 				}
-			});
-			fidObserver.observe({ entryTypes: ["first-input"] });
-		} catch (e) {
-			console.warn("Failed to observe FID events:", e);
-		}
+			},
+			"Failed to observe FID events:",
+		);
 	}
 
-	// 获取 Time to First Byte
 	if ("performance" in window && "getEntriesByType" in window.performance) {
 		const navigationEntries = window.performance.getEntriesByType(
 			"navigation",
@@ -115,19 +131,14 @@ export const initializePerformanceMonitoring = () => {
 		}
 	}
 
-	// 页面卸载时报告指标
-	window.addEventListener("unload", () => {
-		reportMetrics();
-	});
+	window.addEventListener("pagehide", reportMetrics, { once: true });
 };
 
 /**
  * 报告性能指标
  */
 export const reportMetrics = () => {
-	// 这里可以将指标发送到分析服务
-	// 例如：Google Analytics, Sentry 等
-	if (metrics.fcp || metrics.lcp || metrics.cls !== undefined) {
+	if (hasCollectedMetrics()) {
 		console.log("Performance Metrics:", {
 			fcp: metrics.fcp ? `${metrics.fcp}ms` : "N/A",
 			lcp: metrics.lcp ? `${metrics.lcp}ms` : "N/A",
