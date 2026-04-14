@@ -25,7 +25,7 @@ import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
 
 // https://astro.build/config
 export default defineConfig({
-	site: "https://blog.lvcdy.cn",
+	site: "https://dfnbxjj688.xyz",
 	base: "/",
 	trailingSlash: "always",
 	// 性能优化：启用输出压缩
